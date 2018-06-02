@@ -15,22 +15,16 @@ def train_processor(training_data, config_dir):
 	trainer.train(training_data)
 	model_directory = trainer.persist(os.path.join(os.path.dirname(__file__), './nlu/sample/default/'))
 
-def interpret_data_for(text_to_be_parsed, user_name="User"):
+def interpret_query_for(text_to_be_parsed, user_name="User"):
+	# Example scenario:
+	# text_to_be_parsed: 'what is the total population?'
 	metadata = Metadata.load(model_directory)
 	interpreter = Interpreter.load(model_directory)
 	interpreted_data = interpreter.parse(text_to_be_parsed.decode('utf-8'))
-	return get_response_for(interpreted_data, user_name)
+	return get_structured_query(interpreted_data, user_name)
 
-def get_response_for(interpreted_data, user_name="User"):
-	intent = interpreted_data['intent']['name']
-	print(intent)
-	if(intent == u"greet"):
-		return "Hello! Hope you are having a good day"
-	elif(intent == u"inventory_search"):
-		entity = interpreted_data['entities'][0]['value']
-		if entity == "inventory_type":
-			return "Hold on, looking for " + str(entity) + ".."
-		elif entity == "inventory_storage":
-			return "Hold on, let me have a look at " + str(entity) + ".."
-	else:
-		return "Cant understand the query"
+def get_structured_query(interpreted_data, user_name="User"):
+	# Example scenario:
+	# interpreted_data = { intent: 'some_search_operation', entities:[{total:'count'},{population:'table'}] }
+	# given some_search_operation intent, and entities -> output should be SQL:"select count(*) from population"
+	pass
